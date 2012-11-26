@@ -45,12 +45,18 @@ namespace Pickles.DocumentationBuilders.HTML
 
         public XElement Format(Scenario scenario, int id)
         {
+          var tags = RetrieveTags(scenario);
+
+          if (tags.Contains("@future"))
+          {
+              return new XElement(xmlns + "li");
+          }
+          
           var header = new XElement(
             xmlns + "div", 
             new XAttribute("class", "scenario-heading"), 
             new XElement(xmlns + "h2", scenario.Name));
 
-          var tags = RetrieveTags(scenario);
           if (tags.Length > 0)
           {
             var paragraph = new XElement(this.xmlns + "p", CreateTagElements(tags.OrderBy(t => t).ToArray()));
@@ -90,7 +96,7 @@ namespace Pickles.DocumentationBuilders.HTML
         return result.ToArray();
       }
 
-      private static string[] RetrieveTags(Scenario scenario)
+      internal static string[] RetrieveTags(Scenario scenario)
       {
         if (scenario == null) return new string[0];
 

@@ -18,6 +18,7 @@
 
 #endregion
 
+using System.Linq;
 using System.Xml.Linq;
 using Pickles.Parser;
 
@@ -48,6 +49,13 @@ namespace Pickles.DocumentationBuilders.HTML
 
         public XElement Format(Feature feature)
         {
+            var tags = RetrieveTags(feature);
+
+            if (tags.Contains("@future"))
+            {
+                return new XElement(xmlns + "li");
+            }
+
             var div = new XElement(xmlns + "div",
                                    new XAttribute("id", "feature"),
                                    htmlImageResultFormatter.Format(feature),
@@ -84,5 +92,13 @@ namespace Pickles.DocumentationBuilders.HTML
         }
 
         #endregion
+
+        public static string[] RetrieveTags(Feature feature)
+        {
+            if (feature == null) return new string[0];
+            return feature.Tags
+                .Concat(feature.FeatureElements.OfType<Scenario>().SelectMany(HtmlScenarioFormatter.RetrieveTags))
+                .Concat(feature.FeatureElements.OfType<ScenarioOutline>().SelectMany(HtmlScenarioOutlineFormatter.RetrieveTags)).ToArray();
+        }
     }
 }

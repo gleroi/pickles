@@ -20,6 +20,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using NGenerics.DataStructures.Trees;
 using Pickles.DirectoryCrawler;
@@ -50,7 +51,12 @@ namespace Pickles.DocumentationBuilders.HTML
                           continue;
                       }
 
-                      ul.Add(AddNodeForFile(xmlns, file, childNode));
+                      XElement addNodeForFile = AddNodeForFile(xmlns, file, childNode);
+
+                      if (addNodeForFile != null)
+                      {
+                          ul.Add(addNodeForFile);
+                      }
                   }
                   else
                   {
@@ -118,6 +124,19 @@ namespace Pickles.DocumentationBuilders.HTML
 
         private XElement AddNodeForFile(XNamespace xmlns, Uri file, GeneralTree<IDirectoryTreeNode> childNode)
         {
+            var featureNode = childNode.Data as FeatureDirectoryTreeNode;
+
+            if (featureNode != null)
+            {
+                Feature feature = featureNode.Feature;
+                var tags = HtmlFeatureFormatter.RetrieveTags(feature);
+
+                if (tags.Contains("@future"))
+                {
+                    return null;
+                }
+            }
+
             var xElement = new XElement(xmlns + "li", new XAttribute("class", "file"));
 
             string nodeText = childNode.Data.Name;
@@ -131,7 +150,6 @@ namespace Pickles.DocumentationBuilders.HTML
                                           nodeText));
             }
 
-          var featureNode = childNode.Data as FeatureDirectoryTreeNode;
           if (featureNode != null && this.imageResultFormatter != null)
           {
             Feature feature = featureNode.Feature;

@@ -87,6 +87,13 @@ namespace Pickles.DocumentationBuilders.HTML
 
         public XElement Format(ScenarioOutline scenarioOutline, int id)
         {
+            var tags = RetrieveTags(scenarioOutline);
+
+            if (tags.Contains("@future"))
+            {
+                return new XElement(xmlns + "li");
+            }
+
             return new XElement(xmlns + "li",
                                 new XAttribute("class", "scenario"),
                                 htmlImageResultFormatter.Format(scenarioOutline),
@@ -96,6 +103,15 @@ namespace Pickles.DocumentationBuilders.HTML
 			                    	? null 
 			                    	: FormatExamples(scenarioOutline)
                 );
+        }
+
+        internal static string[] RetrieveTags(ScenarioOutline scenarioOutline)
+        {
+            if (scenarioOutline == null) return new string[0];
+
+            if (scenarioOutline.Feature == null) return scenarioOutline.Tags.ToArray();
+
+            return scenarioOutline.Feature.Tags.Concat(scenarioOutline.Tags).ToArray();
         }
     }
 }
