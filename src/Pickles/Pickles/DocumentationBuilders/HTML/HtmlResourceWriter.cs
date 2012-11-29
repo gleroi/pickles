@@ -18,12 +18,13 @@
 
 #endregion
 
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Reflection;
 
-namespace Pickles
+namespace PicklesDoc.Pickles.DocumentationBuilders.HTML
 {
     public class HtmlResourceWriter
     {
@@ -45,7 +46,7 @@ namespace Pickles
             using (
                 var reader =
                     new StreamReader(
-                        Assembly.GetExecutingAssembly().GetManifestResourceStream("Pickles.Resources." + filename)))
+                        Assembly.GetExecutingAssembly().GetManifestResourceStream("PicklesDoc.Pickles.Resources." + filename)))
             using (var writer = new StreamWriter(path))
             {
                 writer.Write(reader.ReadToEnd());
@@ -61,7 +62,7 @@ namespace Pickles
             using (
                 Image image =
                     Image.FromStream(
-                        Assembly.GetExecutingAssembly().GetManifestResourceStream("Pickles.Resources.images." + filename))
+                        Assembly.GetExecutingAssembly().GetManifestResourceStream("PicklesDoc.Pickles.Resources.images." + filename))
                 )
             {
                 image.Save(path, ImageFormat.Png);
@@ -74,7 +75,7 @@ namespace Pickles
         using (
           var reader =
             new StreamReader(
-              Assembly.GetExecutingAssembly().GetManifestResourceStream("Pickles.Resources.scripts." +
+              Assembly.GetExecutingAssembly().GetManifestResourceStream("PicklesDoc.Pickles.Resources.scripts." +
                                                                         filename)))
         using (var writer = new StreamWriter(path))
         {
@@ -88,7 +89,7 @@ namespace Pickles
       private void WriteFont(string folder, string filename)
       {
           Assembly assembly = Assembly.GetExecutingAssembly();
-          using (var input = assembly.GetManifestResourceStream("Pickles.Resources.fonts." + filename))
+          using (var input = assembly.GetManifestResourceStream("PicklesDoc.Pickles.Resources.fonts." + filename))
           {
               using (var output = File.Open(Path.Combine(folder, filename), FileMode.Create))
               {
@@ -99,31 +100,31 @@ namespace Pickles
 
         public void WriteTo(string folder)
         {
-            WriteStyleSheet(folder, "master.css");
-            WriteStyleSheet(folder, "reset.css");
-            WriteStyleSheet(folder, "global.css");
-            WriteStyleSheet(folder, "structure.css");
-            WriteStyleSheet(folder, "print.css");
-            WriteStyleSheet(folder, "font-awesome.css");
+            this.WriteStyleSheet(folder, "master.css");
+            this.WriteStyleSheet(folder, "reset.css");
+            this.WriteStyleSheet(folder, "global.css");
+            this.WriteStyleSheet(folder, "structure.css");
+            this.WriteStyleSheet(folder, "print.css");
+            this.WriteStyleSheet(folder, "font-awesome.css");
 
             string imagesFolder = Path.Combine(folder, "images");
             if (!Directory.Exists(imagesFolder)) Directory.CreateDirectory(imagesFolder);
-            WriteImage(imagesFolder, "success.png");
-            WriteImage(imagesFolder, "failure.png");
-            WriteImage(imagesFolder, "inconclusive.png");
+            this.WriteImage(imagesFolder, "success.png");
+            this.WriteImage(imagesFolder, "failure.png");
+            this.WriteImage(imagesFolder, "inconclusive.png");
 
             string scriptsFolder = Path.Combine(folder, "scripts");
             if (!Directory.Exists(scriptsFolder)) Directory.CreateDirectory(scriptsFolder);
-            WriteScript(scriptsFolder, "jquery.js");
-            WriteScript(scriptsFolder, "scripts.js");
+            this.WriteScript(scriptsFolder, "jquery.js");
+            this.WriteScript(scriptsFolder, "scripts.js");
 
             string fontsFolder = Path.Combine(folder, "fonts");
             if (!Directory.Exists(fontsFolder)) Directory.CreateDirectory(fontsFolder);
-            WriteFont(fontsFolder, "FontAwesome.ttf");
-            WriteFont(fontsFolder, "fontawesome-webfont.eot");
-            WriteFont(fontsFolder, "fontawesome-webfont.svg");
-            WriteFont(fontsFolder, "fontawesome-webfont.ttf");
-            WriteFont(fontsFolder, "fontawesome-webfont.woff");
+            this.WriteFont(fontsFolder, "FontAwesome.ttf");
+            this.WriteFont(fontsFolder, "fontawesome-webfont.eot");
+            this.WriteFont(fontsFolder, "fontawesome-webfont.svg");
+            this.WriteFont(fontsFolder, "fontawesome-webfont.ttf");
+            this.WriteFont(fontsFolder, "fontawesome-webfont.woff");
         }
     }
 }

@@ -18,11 +18,13 @@
 
 #endregion
 
+using System;
 using NGenerics.DataStructures.Trees;
-using Pickles.DirectoryCrawler;
 using Autofac;
+using PicklesDoc.Pickles.DirectoryCrawler;
+using PicklesDoc.Pickles.DocumentationBuilders;
 
-namespace Pickles
+namespace PicklesDoc.Pickles
 {
     public class Runner
     {

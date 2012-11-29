@@ -18,14 +18,17 @@
 
 #endregion
 
+using System;
 using NUnit.Framework;
 using Autofac;
-using Pickles.DocumentationBuilders.DITA;
-using Pickles.DocumentationBuilders.Excel;
-using Pickles.DocumentationBuilders.Word;
+using PicklesDoc.Pickles.DocumentationBuilders;
+using PicklesDoc.Pickles.DocumentationBuilders.DITA;
+using PicklesDoc.Pickles.DocumentationBuilders.Excel;
+using PicklesDoc.Pickles.DocumentationBuilders.HTML;
+using PicklesDoc.Pickles.DocumentationBuilders.Word;
 using Should;
 
-namespace Pickles.Test
+namespace PicklesDoc.Pickles.Test
 {
     public class WhenResolvingADocumentationBuilder : BaseFixture
     {

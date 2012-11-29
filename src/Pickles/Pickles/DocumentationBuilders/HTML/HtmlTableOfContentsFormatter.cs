@@ -23,11 +23,11 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using NGenerics.DataStructures.Trees;
-using Pickles.DirectoryCrawler;
-using Pickles.Extensions;
-using Pickles.Parser;
+using PicklesDoc.Pickles.DirectoryCrawler;
+using PicklesDoc.Pickles.Extensions;
+using PicklesDoc.Pickles.Parser;
 
-namespace Pickles.DocumentationBuilders.HTML
+namespace PicklesDoc.Pickles.DocumentationBuilders.HTML
 {
     public class HtmlTableOfContentsFormatter
     {
@@ -60,7 +60,7 @@ namespace Pickles.DocumentationBuilders.HTML
                   }
                   else
                   {
-                      ul.Add(AddNodeForDirectory(xmlns, file, childNode));
+                      ul.Add(this.AddNodeForDirectory(xmlns, file, childNode));
                   }
               }
 
@@ -76,7 +76,7 @@ namespace Pickles.DocumentationBuilders.HTML
                              new XElement(xmlns + "a",
                                           new XAttribute("href", childNode.Data.GetRelativeUriTo(file) + "index.html"),
                                           new XText(childNode.Data.Name))),
-                BuildListItems(xmlns, file, childNode));
+                this.BuildListItems(xmlns, file, childNode));
 
             return xElement;
         }
@@ -177,13 +177,13 @@ namespace Pickles.DocumentationBuilders.HTML
         {
             XNamespace xmlns = HtmlNamespace.Xhtml;
 
-            XElement ul = BuildListItems(xmlns, file, features);
+            XElement ul = this.BuildListItems(xmlns, file, features);
             ul.AddFirst(AddNodeForHome(xmlns, file, outputFolder));
 
             return new XElement(
                 xmlns + "div",
                 new XAttribute("id", "toc"),
-                BuildCollapser(xmlns),
+                this.BuildCollapser(xmlns),
                 ul);
         }
     }
