@@ -67,5 +67,79 @@ I also enjoy ordering things
             description.Elements().ElementAt(7).ShouldBeNamed("p");
             description.Elements().ElementAt(8).ShouldBeNamed("ol");
         }
+
+        [Test]
+        public void ThenCanFormatMarkdownTableExtensions()
+        {
+          var configuration = Container.Resolve<Configuration>();
+          configuration.TestResultsFile = null;
+
+          var feature = new Feature
+          {
+            Name = "A feature",
+            Description =
+@"In order to see the description as nice HTML
+As a Pickles user
+I want to see the descriptions written in markdown rendered with tables
+
+| Table Header 1 | Table Header 2 |
+| -------------- | -------------- |
+| Cell value 1   | Cell value 2   |
+| Cell value 3   |                |
+| Cell value 4   | Cell value 5   |
+"
+          };
+
+          var htmlFeatureFormatter = Container.Resolve<HtmlFeatureFormatter>();
+          XElement featureElement = htmlFeatureFormatter.Format(feature);
+          XElement description = featureElement.Elements().FirstOrDefault(element => element.Name.LocalName == "div");
+
+          Assert.NotNull(description);
+          description.ShouldBeNamed("div");
+          description.ShouldBeInInNamespace("http://www.w3.org/1999/xhtml");
+          description.ShouldHaveAttribute("class", "description");
+
+          XElement table = description.Descendants().FirstOrDefault(el => el.Name.LocalName == "table");
+
+          Assert.IsNotNull(table);
+
+        }
+
+        [Test]
+        public void ThenCanFormatMarkdownTableExtensionsEvenIfTheyAreSomewhatMalstructured()
+        {
+          var configuration = Container.Resolve<Configuration>();
+          configuration.TestResultsFile = null;
+
+          var feature = new Feature
+          {
+            Name = "A feature",
+            Description =
+@"In order to see the description as nice HTML
+As a Pickles user
+I want to see the descriptions written in markdown rendered with tables
+
+| Table Header 1 | Table Header 2                         |
+| -------------- | -------------------------------------- |
+| Cell value 1   | Cell value 2                           |
+| Cell value 3     Note the missing column delimiter here |
+| Cell value 4   | Cell value 5                           |
+"
+          };
+
+          var htmlFeatureFormatter = Container.Resolve<HtmlFeatureFormatter>();
+          XElement featureElement = htmlFeatureFormatter.Format(feature);
+          XElement description = featureElement.Elements().FirstOrDefault(element => element.Name.LocalName == "div");
+
+          Assert.NotNull(description);
+          description.ShouldBeNamed("div");
+          description.ShouldBeInInNamespace("http://www.w3.org/1999/xhtml");
+          description.ShouldHaveAttribute("class", "description");
+
+          XElement table = description.Descendants().FirstOrDefault(el => el.Name.LocalName == "table");
+
+          Assert.IsNotNull(table);
+
+        }
     }
 }
