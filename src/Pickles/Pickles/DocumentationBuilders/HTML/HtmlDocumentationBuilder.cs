@@ -23,6 +23,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
+using System.Collections.Generic;
 using NGenerics.DataStructures.Trees;
 using NGenerics.Patterns.Visitor;
 using PicklesDoc.Pickles.DirectoryCrawler;
@@ -50,6 +51,8 @@ namespace PicklesDoc.Pickles.DocumentationBuilders.HTML
 
         #region IDocumentationBuilder Members
 
+        Dictionary<string, FeatureDirectoryTreeNode> featurePaths = new Dictionary<string, FeatureDirectoryTreeNode>();
+
         public void Build(GeneralTree<IDirectoryTreeNode> features)
         {
             if (log.IsInfoEnabled)
@@ -59,6 +62,18 @@ namespace PicklesDoc.Pickles.DocumentationBuilders.HTML
 
             this.htmlResourceWriter.WriteTo(this.configuration.OutputFolder.FullName);
 
+
+            var featureVisitor = new ActionVisitor<IDirectoryTreeNode>(node =>
+            {
+                FeatureDirectoryTreeNode featureNode = node as FeatureDirectoryTreeNode;
+                if (featureNode != null)
+                {
+                    if (!featurePaths.ContainsKey(featureNode.Feature.Name))
+                    {
+                        featurePaths.Add(featureNode.Feature.Name, featureNode);
+                    }
+                }
+            });
 
             var actionVisitor = new ActionVisitor<IDirectoryTreeNode>(node =>
                                                                           {
@@ -99,12 +114,33 @@ namespace PicklesDoc.Pickles.DocumentationBuilders.HTML
                                                                                       this.htmlDocumentFormatter.Format(
                                                                                           node, features,
                                                                                           this.configuration.FeatureFolder);
+                                                                                  CompleteFeatureLinks(document, node.OriginalLocationUrl);
                                                                                   document.Save(writer);
                                                                                   writer.Close();
                                                                               }
                                                                           });
-            if (features != null)
+            if (features != null) {
+                features.AcceptVisitor(featureVisitor);
                 features.AcceptVisitor(actionVisitor);
+            }
+        }
+
+        private void CompleteFeatureLinks(XDocument doc, Uri currentDir)
+        {
+            var links = doc.Descendants(XName.Get("a", HtmlNamespace.Xhtml.NamespaceName));
+            foreach (XElement link in links)
+            {
+                XAttribute href = link.Attribute(XName.Get("href"));
+                if (String.IsNullOrEmpty(href.Value))
+                {
+                    string featureName = link.Value;
+                    FeatureDirectoryTreeNode node;
+                    if (featurePaths.TryGetValue(featureName, out node))
+                    {
+                        href.Value = node.GetRelativeUriTo(currentDir);
+                    }
+                }
+            }
         }
 
         #endregion
